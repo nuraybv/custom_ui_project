@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'screens/app_screens.dart'; // Ekranlarımızı import edirik
+import 'screens/onboarding_screen.dart';
+import 'screens/profile_screen.dart';
+import 'screens/settings_screen.dart';
+import 'screens/edit_profile_screen.dart';
 
 final GoRouter _router = GoRouter(
   initialLocation: '/',

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// 1. Dizayndakı Bənövşəyi Əsas Düymə
+// Custom Purple Button
 class CustomPurpleButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
@@ -13,37 +13,40 @@ class CustomPurpleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+
     return SizedBox(
       width: double.infinity,
-      height: 55,
+      height: screenHeight * 0.065, // Responsiv hündürlük
       child: ElevatedButton(
-        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF6C63FF),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           elevation: 0,
         ),
+        onPressed: onPressed,
         child: Text(
           text,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ),
     );
   }
 }
 
-// 2. Settings Ekranındakı Menyu Sətirləri
+// Menu Row Widget
 class MenuRowWidget extends StatelessWidget {
   final IconData leadingIcon;
   final String title;
-  final String? trailingText;
   final VoidCallback onTap;
 
   const MenuRowWidget({
     super.key,
     required this.leadingIcon,
     required this.title,
-    this.trailingText,
     required this.onTap,
   });
 
@@ -51,22 +54,23 @@ class MenuRowWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: onTap,
-      leading: Icon(leadingIcon, color: Colors.grey[700]),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (trailingText != null)
-            Text(trailingText!, style: TextStyle(color: Colors.grey[500])),
-          const SizedBox(width: 5),
-          const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-        ],
+      leading: Icon(leadingIcon, color: const Color(0xFF2D2D2D)),
+      title: Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: Color(0xFF2D2D2D),
+        ),
       ),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
     );
   }
 }
 
-// 3. Edit Profile Ekranındakı Məlumat Daxiletmə Sahələri
+// Custom Input Field
 class CustomInputField extends StatelessWidget {
   final String label;
   final String initialValue;
@@ -86,16 +90,11 @@ class CustomInputField extends StatelessWidget {
         decoration: InputDecoration(
           labelText: label,
           labelStyle: const TextStyle(color: Colors.grey),
-          floatingLabelBehavior: FloatingLabelBehavior.always,
           filled: true,
-          fillColor: Colors.white,
+          fillColor: const Color(0xFFF1F3F5),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey.shade300),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey.shade200),
+            borderSide: BorderSide.none,
           ),
         ),
       ),
