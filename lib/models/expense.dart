@@ -1,0 +1,37 @@
+class Expense {
+  final int? id;
+  final String title;
+  final double amount;
+  final String category;
+  final DateTime date;
+
+  const Expense({
+    this.id,
+    required this.title,
+    required this.amount,
+    required this.category,
+    required this.date,
+  });
+
+  // DB-dən gələn Map-i Expense obyektinə çevirir
+  factory Expense.fromMap(Map<String, dynamic> map) {
+    return Expense(
+      id: map['id'] as int?,
+      title: map['title'] as String,
+      amount: (map['amount'] as num).toDouble(),
+      category: map['category'] as String,
+      date: DateTime.parse(map['date'] as String),
+    );
+  }
+
+  // Expense obyektini DB-yə yazmaq üçün Map-ə çevirir
+  Map<String, dynamic> toMap() {
+    return {
+      if (id != null) 'id': id,
+      'title': title,
+      'amount': amount,
+      'category': category,
+      'date': date.toIso8601String(),
+    };
+  }
+}
