@@ -58,14 +58,19 @@ class ExpenseProvider extends ChangeNotifier {
   }
 
   Future<void> fetchExpenses() async {
-    _isLoading = true;
-    notifyListeners();
+  _isLoading = true;
+  notifyListeners();
 
+  try {
     _expenses = await DatabaseHelper.instance.getAllExpenses();
-
-    _isLoading = false;
-    notifyListeners();
+  } catch (e) {
+    debugPrint('Database error (Web or Unsupported platform): $e');
+    _expenses = []; // Xəta çıxarsa tətbiq çökməsin, boş siyahı ilə davam etsin
   }
+
+  _isLoading = false;
+  notifyListeners();
+}
 
   Future<void> addExpense(Expense expense) async {
     await DatabaseHelper.instance.createExpense(expense);
