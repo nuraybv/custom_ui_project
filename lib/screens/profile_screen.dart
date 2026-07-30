@@ -1,53 +1,130 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import '../widgets/custom_components.dart';
+import 'settings_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Profile'),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.black,
+        title: const Text('Profile', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
+          ),
+        ],
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // Profil şəkli və məlumatlar
+          Center(
+            child: Column(
+              children: [
+                const CircleAvatar(
+                  radius: 45,
+                  backgroundColor: Colors.deepPurple,
+                  child: Icon(Icons.person, size: 50, color: Colors.white),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Fuad Eliyev',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'fuad.eliyev@gmail.com',
+                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Statistika kartları (Referansdakı kimi)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              CircleAvatar(
-                radius: screenHeight * 0.06,
-                backgroundColor: const Color(0xFF6C63FF),
-              ),
-              SizedBox(height: screenHeight * 0.02),
-              const Text(
-                'Fuad Aliyev',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-              const Text(
-                'fuad.aliyev@gmail.com',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.grey),
-              ),
-              SizedBox(height: screenHeight * 0.03),
-              CustomPurpleButton(
-                text: 'Go to Settings',
-                onPressed: () => context.push('/settings'), // push naviqasiya yığınını saxlayır
-              ),
+              _buildStatCard('24', 'Expenses'),
+              _buildStatCard('128', 'Categories'),
+              _buildStatCard('7', 'Goals'),
             ],
           ),
-        ),
+          const SizedBox(height: 24),
+
+          // Menyu siyahısı
+          const Text('Menu', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 12)),
+          const SizedBox(height: 8),
+          Card(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: Colors.grey.shade200),
+            ),
+            child: Column(
+              children: [
+                _buildMenuItem(Icons.receipt_long, 'My Activity', () {}),
+                _buildDivider(),
+                _buildMenuItem(Icons.bookmark_border, 'Saved Items', () {}),
+                _buildDivider(),
+                _buildMenuItem(Icons.folder_outlined, 'My Projects', () {}),
+                _buildDivider(),
+                _buildMenuItem(Icons.message_outlined, 'Messages', () {}),
+                _buildDivider(),
+                _buildMenuItem(Icons.notifications_outlined, 'Notifications', () {}),
+                _buildDivider(),
+                _buildMenuItem(Icons.security, 'Privacy & Security', () {}),
+                _buildDivider(),
+                _buildMenuItem(Icons.help_outline, 'Help & Support', () {}),
+                _buildDivider(),
+                _buildMenuItem(Icons.info_outline, 'About App', () {}),
+              ],
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  Widget _buildStatCard(String count, String label) {
+    return Container(
+      width: 100,
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        children: [
+          Text(count, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
+          const SizedBox(height: 4),
+          Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuItem(IconData icon, String title, VoidCallback onTap) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.deepPurple, size: 22),
+      title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+      onTap: onTap,
+    );
+  }
+
+  Widget _buildDivider() {
+    return const Divider(height: 1, thickness: 1, indent: 50, endIndent: 16);
   }
 }
