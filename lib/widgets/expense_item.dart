@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/expense.dart';
+import '../screens/detail_screen.dart'; // 1. DetailScreen-i bura əlavə edirik
 
 class ExpenseItem extends StatelessWidget {
   final Expense expense;
@@ -22,6 +23,21 @@ class ExpenseItem extends StatelessWidget {
         ),
         title: Text(expense.title, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text('${expense.category} • ${expense.date.toString().split(' ')[0]}'),
+        
+        // 2. BURANI (onTap) ƏLAVƏ EDİRİK:
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DetailScreen(
+                title: expense.title,
+                description: 'Category: ${expense.category}\nAmount: \$${expense.amount.toStringAsFixed(2)}\nDate: ${expense.date.toString().split(' ')[0]}',
+                imageUrl: null,
+              ),
+            ),
+          );
+        },
+
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

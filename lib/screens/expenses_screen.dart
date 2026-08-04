@@ -4,8 +4,24 @@ import '../models/expense.dart';
 import '../providers/expense_provider.dart';
 import '../widgets/expense_item.dart';
 
-class ExpensesScreen extends StatelessWidget {
+// 1. StatefulWidget edirik ki, səhifə açılanda məlumatları çəkə bilək
+class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
+
+  @override
+  State<ExpensesScreen> createState() => _ExpensesScreenState();
+}
+
+class _ExpensesScreenState extends State<ExpensesScreen> {
+  
+  @override
+  void initState() {
+    super.initState();
+    // 2. Səhifə ilk dəfə açılan kimi bazadakı xərcləri avtomatik yükləyirik
+    Future.microtask(() =>
+      Provider.of<ExpenseProvider>(context, listen: false).fetchExpenses()
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

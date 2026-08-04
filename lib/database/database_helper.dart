@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/expense.dart';
@@ -5,6 +6,10 @@ import '../models/expense.dart';
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
+
+  // Veb üçün müvəqqəti yaddaş siyahısı (Chrome-da çökmməsi üçün)
+  final List<Expense> _webMemoryList = [];
+  int _webIdCounter = 1;
 
   DatabaseHelper._init();
 
@@ -39,12 +44,29 @@ class DatabaseHelper {
 
   // 1. CREATE - Yeni xərc əlavə etmək
   Future<int> createExpense(Expense expense) async {
+    if (kIsWeb) {
+      // Veb üçün yerli siyahıya əlavə edirik
+      final newExp = Expense(
+        id: _webIdCounter++,
+        title: expense.title,
+        amount: expense.amount,
+        date: expense.date,
+        category: expense.category,
+      );
+      _webMemoryList.add(newExp);
+      return newExp.id!;
+    }
+
     final db = await instance.database;
     return await db.insert('expenses', expense.toMap());
   }
 
-  // 2. READ - Bütün xərcləri tarixinə görə sıralayıb gətirmək
+  // 2. READ - Bütün xərcləri gətirmək
   Future<List<Expense>> getAllExpenses() async {
+    if (kIsWeb) {
+      return List.from(_webMemoryList);
+    }
+
     final db = await instance.database;
     final result = await db.query('expenses', orderBy: 'date DESC');
     return result.map((map) => Expense.fromMap(map)).toList();
@@ -52,6 +74,14 @@ class DatabaseHelper {
 
   // 3. UPDATE - Mövcud xərci yeniləmək
   Future<int> updateExpense(Expense expense) async {
+    if (kIsWeb) {
+      final index = _webMemoryList.indexWhere((e) => e.id == expense.id);
+      if (index != -1) {
+        _webMemoryList[index] = expense;
+      }
+      return 1;
+    }
+
     final db = await instance.database;
     return await db.update(
       'expenses',
@@ -61,8 +91,13 @@ class DatabaseHelper {
     );
   }
 
-  // 4. DELETE - Xərci ID-sinə görə silmək
+  // 4. DELETE - Xərci silmək
   Future<int> deleteExpense(int id) async {
+    if (kIsWeb) {
+      _webMemoryList.removeWhere((e) => e.id == id);
+      return 1;
+    }
+
     final db = await instance.database;
     return await db.delete(
       'expenses',
@@ -71,8 +106,8 @@ class DatabaseHelper {
     );
   }
 
-  // Bazanı bağlamaq üçün
   Future<void> close() async {
+    if (kIsWeb) return;
     final db = await instance.database;
     await db.close();
   }
