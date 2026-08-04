@@ -7,11 +7,13 @@ enum SortOption { dateDescending, dateAscending, amountDescending, amountAscendi
 class ExpenseProvider extends ChangeNotifier {
   List<Expense> _expenses = [];
   bool _isLoading = false;
+  String? _errorMessage; // Xəta mesajını saxlamaq üçün
   
   String _selectedCategory = 'All';
   SortOption _selectedSortOption = SortOption.dateDescending;
 
   bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage; // Getter
   String get selectedCategory => _selectedCategory;
   SortOption get selectedSortOption => _selectedSortOption;
 
@@ -38,39 +40,39 @@ class ExpenseProvider extends ChangeNotifier {
         filteredList.sort((a, b) => b.amount.compareTo(a.amount));
         break;
       case SortOption.amountAscending:
-        filteredList.sort((a, b) => a.amount.compareTo(b.amount));
+        filteredList.sort((a, b) => a.amount.compareTo(a.amount));
         break;
     }
 
     return filteredList;
   }
 
-  // Kategoriyanı dəyişmək üçün metod
   void setCategory(String category) {
     _selectedCategory = category;
     notifyListeners();
   }
 
-  // Sıralama üsulunu dəyişmək üçün metod
   void setSortOption(SortOption sortOption) {
     _selectedSortOption = sortOption;
     notifyListeners();
   }
 
   Future<void> fetchExpenses() async {
-  _isLoading = true;
-  notifyListeners();
+    _isLoading = true;
+    _errorMessage = null; // Hər dəfə yükləyəndə əvvəlki xətanı təmizləyirik
+    notifyListeners();
 
-  try {
-    _expenses = await DatabaseHelper.instance.getAllExpenses();
-  } catch (e) {
-    debugPrint('Database error (Web or Unsupported platform): $e');
-    _expenses = []; // Xəta çıxarsa tətbiq çökməsin, boş siyahı ilə davam etsin
+    try {
+      _expenses = await DatabaseHelper.instance.getAllExpenses();
+    } catch (e) {
+      debugPrint('Database error: $e');
+      _errorMessage = 'Failed to load expenses. Please try again.'; // Xəta mesajı
+      _expenses = [];
+    }
+
+    _isLoading = false;
+    notifyListeners();
   }
-
-  _isLoading = false;
-  notifyListeners();
-}
 
   Future<void> addExpense(Expense expense) async {
     await DatabaseHelper.instance.createExpense(expense);
