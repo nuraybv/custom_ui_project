@@ -4,7 +4,6 @@ import '../models/expense.dart';
 import '../providers/expense_provider.dart';
 import '../widgets/expense_item.dart';
 
-// 1. StatefulWidget edirik ki, səhifə açılanda məlumatları çəkə bilək
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
 
@@ -13,11 +12,9 @@ class ExpensesScreen extends StatefulWidget {
 }
 
 class _ExpensesScreenState extends State<ExpensesScreen> {
-  
   @override
   void initState() {
     super.initState();
-    // 2. Səhifə ilk dəfə açılan kimi bazadakı xərcləri avtomatik yükləyirik
     Future.microtask(() =>
       Provider.of<ExpenseProvider>(context, listen: false).fetchExpenses()
     );
@@ -100,7 +97,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
           const Divider(),
 
-          // 📋 Siyahı / Empty State
+          // 📋 Siyahı / Pull-to-Refresh vəziyyəti
           Expanded(
             child: provider.isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -118,45 +115,48 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                           ],
                         ),
                       )
-                    : ListView.builder(
-                        itemCount: provider.expenses.length,
-                        itemBuilder: (ctx, i) {
-                          final expense = provider.expenses[i];
-                          return ExpenseItem(
-                            expense: expense,
-                            onDelete: () {
-                              showDialog(
-                                context: context,
-                                builder: (_) => AlertDialog(
-                                  title: const Text('Delete Expense'),
-                                  content: const Text('Are you sure you want to delete this expense?'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.of(context).pop(),
-                                      child: const Text('Cancel'),
-                                    ),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                                      onPressed: () {
-                                        provider.deleteExpense(expense.id!);
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text('Delete', style: TextStyle(color: Colors.white)),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
+                    : RefreshIndicator(
+                        onRefresh: () async {
+                          await provider.fetchExpenses();
                         },
+                        child: ListView.builder(
+                          itemCount: provider.expenses.length,
+                          itemBuilder: (ctx, i) {
+                            final expense = provider.expenses[i];
+                            return ExpenseItem(
+                              expense: expense,
+                              onDelete: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    title: const Text('Delete Expense'),
+                                    content: const Text('Are you sure you want to delete this expense?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(context).pop(),
+                                        child: const Text('Cancel'),
+                                      ),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                                        onPressed: () {
+                                          provider.deleteExpense(expense.id!);
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('Delete', style: TextStyle(color: Colors.white)),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          _showAddExpenseModal(context, provider);
-        },
+        onPressed: () => _showAddExpenseModal(context, provider),
         label: const Text('Add Expense'),
         icon: const Icon(Icons.add),
         backgroundColor: Colors.deepPurple,
