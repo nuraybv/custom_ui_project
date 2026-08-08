@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // Provider üçün vacibdir
 import 'package:custom_ui_project/screens/main_navigation.dart';
+import 'package:custom_ui_project/services/auth_service.dart'; // AuthService üçün vacibdir
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,22 +26,38 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  // Handle form submission, validation, and navigation
-  void _submit() {
+ // Handle form submission, authentication logic, and navigation
+  void _submit() async {
     if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(_isLoginMode ? 'Login successful!' : 'Registration successful!'),
-        ),
-      );
+      try {
+        final authService = Provider.of<AuthService>(context, listen: false);
 
-      // Navigate to main navigation screen and remove login screen from stack
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const MainNavigation(),
-        ),
-      );
+        // Rejime görə Login və ya Register funksiyasını çağırırıq
+        if (_isLoginMode) {
+          await authService.login(_emailController.text, _passwordController.text);
+        } else {
+          await authService.register(_emailController.text, _passwordController.text);
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_isLoginMode ? 'Login successful!' : 'Registration successful!'),
+          ),
+        );
+
+        // Navigate to main navigation screen and remove login screen from stack
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const MainNavigation(),
+          ),
+        );
+      } catch (e) {
+        // Əgər xəta baş verərsə (məsələn, yanlış şifrə), ekranda göstəririk
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
     }
   }
 
