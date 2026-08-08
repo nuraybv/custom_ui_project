@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:custom_ui_project/screens/main_navigation.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,12 +24,20 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  // Handle form submission and validation
+  // Handle form submission, validation, and navigation
   void _submit() {
     if (_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(_isLoginMode ? 'Login successful!' : 'Registration successful!'),
+        ),
+      );
+
+      // Navigate to main navigation screen and remove login screen from stack
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const MainNavigation(),
         ),
       );
     }

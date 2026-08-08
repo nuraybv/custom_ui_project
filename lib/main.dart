@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/expense_provider.dart';
-import 'screens/main_navigation.dart';
+import 'screens/login_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.deepPurple,
           useMaterial3: true,
         ),
-        home: const MainNavigation(),
+        home: const LoginScreen(), // App starts from Login screen
       ),
     );
   }
