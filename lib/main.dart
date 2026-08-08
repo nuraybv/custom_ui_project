@@ -1,8 +1,9 @@
-import 'services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/expense_provider.dart';
+import 'services/auth_service.dart';
 import 'screens/login_screen.dart';
+import 'screens/main_navigation.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,8 +26,25 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.deepPurple,
           useMaterial3: true,
         ),
-        home: const LoginScreen(), // App starts from Login screen
+        home: const AuthWrapper(), // Avtomatik yoxlama ekranı
       ),
     );
+  }
+}
+
+// AuthWrapper: İstifadəçinin giriş statusuna görə səhifəni seçir
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+
+    // Əgər istifadəçi daxil olubsa MainNavigation, əks halda LoginScreen göstərilir
+    if (authService.isAuthenticated) {
+      return const MainNavigation();
+    } else {
+      return const LoginScreen();
+    }
   }
 }
