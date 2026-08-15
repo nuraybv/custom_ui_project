@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/auth_service.dart';
 import 'settings_screen.dart';
+import 'login_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // AuthService-i dinləyirik ki, daxil olan istifadəçi dəyişdikdə yenilənsin
+    final authService = Provider.of<AuthService>(context);
+    final userEmail = authService.currentUserEmail ?? 'user@example.com';
+    final userName = userEmail.split('@')[0]; // E-poçtdan istifadəçi adı düzəldirik
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -27,7 +35,7 @@ class ProfileScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Profil şəkli və məlumatlar
+          // Profil şəkli və dinamik məlumatlar
           Center(
             child: Column(
               children: [
@@ -37,13 +45,13 @@ class ProfileScreen extends StatelessWidget {
                   child: Icon(Icons.person, size: 50, color: Colors.white),
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'Fuad Eliyev',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Text(
+                  userName.toUpperCase(),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'fuad.eliyev@gmail.com',
+                  userEmail,
                   style: TextStyle(color: Colors.grey[600], fontSize: 14),
                 ),
               ],
@@ -51,7 +59,7 @@ class ProfileScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // Statistika kartları (Referansdakı kimi)
+          // Statistika kartları
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -91,6 +99,46 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 24),
+
+          // 🚪 Log Out Düyməsi
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red.shade50,
+                foregroundColor: Colors.red,
+                elevation: 0,
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: () async {
+                try {
+                  final authSrv = Provider.of<AuthService>(context, listen: false);
+                  await authSrv.logout();
+
+                  if (context.mounted) {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LoginScreen()),
+                      (route) => false,
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Logout failed: $e')),
+                    );
+                  }
+                }
+              },
+              icon: const Icon(Icons.logout),
+              label: const Text('Log Out', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            ),
+          ),
+          const SizedBox(height: 20),
         ],
       ),
     );

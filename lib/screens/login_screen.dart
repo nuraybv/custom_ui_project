@@ -53,9 +53,12 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
       } catch (e) {
-        // Əgər xəta baş verərsə (məsələn, yanlış şifrə), ekranda göstəririk
+        // Əgər xəta baş verərsə (məsələn, yanlış şifrə), ekranda qırmızı fonla göstəririk
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
