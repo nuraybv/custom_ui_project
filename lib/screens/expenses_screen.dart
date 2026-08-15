@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/expense.dart';
 import '../providers/expense_provider.dart';
 import '../widgets/expense_item.dart';
+import '../widgets/receipt_image_picker.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -181,62 +182,66 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           right: 20,
           bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
         ),
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Add New Expense', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: titleController,
-                decoration: const InputDecoration(labelText: 'Title'),
-                validator: (val) {
-                  if (val == null || val.trim().isEmpty) return 'Please enter a title';
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: amountController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Amount (\$)'),
-                validator: (val) {
-                  if (val == null || val.trim().isEmpty) return 'Please enter an amount';
-                  final parsed = double.tryParse(val);
-                  if (parsed == null || parsed <= 0) return 'Please enter a valid positive number';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                initialValue: selectedCat,
-                items: ['Food', 'Transport', 'Bills', 'Entertainment', 'Other']
-                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-                    .toList(),
-                onChanged: (val) => selectedCat = val!,
-                decoration: const InputDecoration(labelText: 'Category'),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                  minimumSize: const Size(double.infinity, 45),
+        child: SingleChildScrollView(
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('Add New Expense', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: titleController,
+                  decoration: const InputDecoration(labelText: 'Title'),
+                  validator: (val) {
+                    if (val == null || val.trim().isEmpty) return 'Please enter a title';
+                    return null;
+                  },
                 ),
-                onPressed: () {
-                  if (formKey.currentState!.validate()) {
-                    final newExpense = Expense(
-                      title: titleController.text.trim(),
-                      amount: double.parse(amountController.text.trim()),
-                      date: DateTime.now(),
-                      category: selectedCat,
-                    );
-                    provider.addExpense(newExpense);
-                    Navigator.of(ctx).pop();
-                  }
-                },
-                child: const Text('Save Expense', style: TextStyle(color: Colors.white)),
-              ),
-            ],
+                TextFormField(
+                  controller: amountController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Amount (\$)'),
+                  validator: (val) {
+                    if (val == null || val.trim().isEmpty) return 'Please enter an amount';
+                    final parsed = double.tryParse(val);
+                    if (parsed == null || parsed <= 0) return 'Please enter a valid positive number';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  initialValue: selectedCat,
+                  items: ['Food', 'Transport', 'Bills', 'Entertainment', 'Other']
+                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                      .toList(),
+                  onChanged: (val) => selectedCat = val!,
+                  decoration: const InputDecoration(labelText: 'Category'),
+                ),
+                const SizedBox(height: 16),
+                const ReceiptImagePicker(),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    minimumSize: const Size(double.infinity, 45),
+                  ),
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      final newExpense = Expense(
+                        title: titleController.text.trim(),
+                        amount: double.parse(amountController.text.trim()),
+                        date: DateTime.now(),
+                        category: selectedCat,
+                      );
+                      provider.addExpense(newExpense);
+                      Navigator.of(ctx).pop();
+                    }
+                  },
+                  child: const Text('Save Expense', style: TextStyle(color: Colors.white)),
+                ),
+              ],
+            ),
           ),
         ),
       ),
